@@ -22,7 +22,7 @@ function varargout = triangulacao_stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help triangulacao_stereo_GUI
 
-% Last Modified by GUIDE v2.5 22-Apr-2024 23:33:39
+% Last Modified by GUIDE v2.5 23-Apr-2024 10:18:42
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,9 +54,10 @@ function triangulacao_stereo_GUI_OpeningFcn(hObject, eventdata, handles, varargi
 
 
 handles.pathToReadCalibFile= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\src';
-handles.pathToRead_L= 'C:\Users\mwend\Downloads\para_Comp_Extrinsic_NoApp_Calib_gui_Bouguet\L';
-handles.pathToRead_R= 'C:\Users\mwend\Downloads\para_Comp_Extrinsic_NoApp_Calib_gui_Bouguet\R';
-handles.pathToSave= 'C:\Users\mwend\Downloads\para_Comp_Extrinsic_NoApp_Calib_gui_Bouguet';
+handles.pathToRead_L= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\L';
+handles.pathToRead_R= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\R';
+handles.pathToSave= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+handles.pathToReadPC= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in'; 
 
 handles.fileCalibration_ok= 0;
 handles.pontos2D_L_Ok= 0;
@@ -108,7 +109,8 @@ function pbLoadParametrosCalibracaoStereo_Callback(hObject, eventdata, handles)
 clc;
 close all;
 
-[nameFile pathToRead]= uigetfile(handles.pathToReadCalibFile, 'Escolha o arquivo de calibração estéreo.', '*.mat');
+file= fullfile(handles.pathToReadCalibFile, '*.mat');
+[nameFile pathToRead]= uigetfile(file, 'Escolha o arquivo de calibração estéreo.');
 
 if ~pathToRead
     msg= sprintf('Processo de escolha do arquivo de calibração foi cancelado!');
@@ -275,7 +277,37 @@ function pbShowPCs_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-fShowPCs(handles.xyzStereo);
+fShowPCs(handles.xyzStereo, handles.ShowDuasPCsSobrepostas, handles.pathToReadPC);
 
 % Update handles structure
 guidata(hObject, handles);
+
+
+% --- Executes on button press in rdShowDuasPCsSobrepostas.
+function rdShowDuasPCsSobrepostas_Callback(hObject, eventdata, handles)
+% hObject    handle to rdShowDuasPCsSobrepostas (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rdShowDuasPCsSobrepostas
+
+handles.ShowDuasPCsSobrepostas= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function rdShowDuasPCsSobrepostas_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rdShowDuasPCsSobrepostas (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+handles.ShowDuasPCsSobrepostas= hObject.Value
+
+% Update handles structure
+guidata(hObject, handles);
+
+
