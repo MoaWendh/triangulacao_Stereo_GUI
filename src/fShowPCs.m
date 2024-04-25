@@ -1,6 +1,6 @@
 function fShowPCs(xyzStereo, ShowDuasPCsSobrepostas, pathToReadPC)
 clc;
-close all;
+%close all;
 
 % Escolha a pc que foi gerada:
 numPCs= size(xyzStereo, 2);
@@ -13,9 +13,13 @@ opts.Interpreter = 'tex';
 answer = inputdlg(prompt, dlgtitle, dims, definput, opts);
 pcNum= str2num(cell2mat(answer));
 
+fig= figure;
+fig.Position=[200 200 1800 1100]
+
 if ~ShowDuasPCsSobrepostas
     plot3(xyzStereo{pcNum}(1,:), xyzStereo{pcNum}(2,:), xyzStereo{pcNum}(3,:), '.r')
-
+    msg= sprintf('PC n°:%d', pcNum); 
+    subtitle(msg); 
     axis equal;
     grid on;
     xlabel('X');

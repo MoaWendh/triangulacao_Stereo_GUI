@@ -22,7 +22,7 @@ function varargout = triangulacao_stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help triangulacao_stereo_GUI
 
-% Last Modified by GUIDE v2.5 23-Apr-2024 10:18:42
+% Last Modified by GUIDE v2.5 24-Apr-2024 12:43:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,11 +53,15 @@ function triangulacao_stereo_GUI_OpeningFcn(hObject, eventdata, handles, varargi
 % varargin   command line arguments to triangulacao_stereo_GUI (see VARARGIN)
 
 
-handles.pathToReadCalibFile= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\src';
-handles.pathToRead_L= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\L';
-handles.pathToRead_R= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\R';
+handles.pathToReadCalibFile= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in';
+handles.pathToRead_L= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\09_04_2024_B\L';
+handles.pathToRead_R= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\09_04_2024_B\R';
 handles.pathToSave= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
-handles.pathToReadPC= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in'; 
+handles.pathToReadPC= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+
+handles.pathToReadPC_qualquer= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+
+
 
 handles.fileCalibration_ok= 0;
 handles.pontos2D_L_Ok= 0;
@@ -147,6 +151,8 @@ function pbLoadPontosPlanoImagem_L_Callback(hObject, eventdata, handles)
 
 clc;
 close all;
+
+
 path= fullfile(handles.pathToRead_L,'*.mat');
 [nameFile pathToRead]= uigetfile(path, 'Escolha o arquivo com os pontos 2D da esquerda.', 'MultiSelect', 'on');
 
@@ -155,7 +161,13 @@ if ~pathToRead
     msgbox(msg, '', 'warn');
     return;
 end
+
 handles.pathToRead_L= pathToRead;
+
+% Se a variável handles.param_L já existir, ela será reinicializada: 
+if isfield(handles, 'param_L')
+    handles= rmfield(handles, 'param_L');
+end
 
 if ~iscell(nameFile)
    numFiles= 1;
@@ -180,6 +192,8 @@ if handles.fileCalibration_ok && handles.pontos2D_R_Ok
     handles.pbExecTriangulacao.Enable= 'on'; 
 end
 
+hendles.pbLoadPontosPlanoImagem_R.Enable= 'on';
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -192,6 +206,8 @@ function pbLoadPontosPlanoImagem_R_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 clc;
 close all;
+
+
 path= fullfile(handles.pathToRead_R,'*.mat');
 [nameFile pathToRead]= uigetfile(path, 'Escolha o arquivo com os pontos 2D da direita.', 'MultiSelect', 'on');
 
@@ -201,6 +217,12 @@ if ~pathToRead
     return;
 end
 handles.pathToRead_R= pathToRead;
+
+% Se a variável handles.param_R já existir, ela será reinicializada: 
+if isfield(handles, 'param_R')
+    handles= rmfield(handles, 'param_R');
+end
+
 
 if ~iscell(nameFile)
    numFiles= 1;
@@ -305,9 +327,39 @@ function rdShowDuasPCsSobrepostas_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-handles.ShowDuasPCsSobrepostas= hObject.Value
+handles.ShowDuasPCsSobrepostas= hObject.Value;
 
 % Update handles structure
 guidata(hObject, handles);
+
+
+
+
+% --- Executes on button press in pbExibePcTxtQualquer.
+function pbExibePcTxtQualquer_Callback(hObject, eventdata, handles)
+% hObject    handle to pbExibePcTxtQualquer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+files= fullfile(handles.pathToReadPC_qualquer, '*.txt');
+% Escolhe a PC original para sobrepor a PC gerada "xyzStereo":
+[nameFile path]= uigetfile(files, 'Escolha a PC formato .txt.');
+
+if ~path
+    msg= sprintf('Processo de escolha da PC foi cancelado!');
+    msgbox(msg, '', 'warn');
+    return;
+end
+
+fullPath= fullfile(path, nameFile);
+pcStereo= load(fullPath);
+
+plot3(pcStereo(:,1), pcStereo(:,2), pcStereo(:,3), '.b')
+
+axis equal;
+grid on;
+xlabel('X');
+ylabel('Y');
+zlabel('Z');
 
 
