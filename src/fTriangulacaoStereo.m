@@ -2,10 +2,21 @@
 % Triangulação estéreo a partir de pontos 3D e 2D obtidos pelo algoritmo
 % Bouguet.
 %**************************************************************************
-function xyzStereo= fTriangulacaoStereo(paramStereo, param_L, param_R, pathToSave)
+function xyzStereo= fTriangulacaoStereo(paramStereo, param_L, param_R, pathToSave, habSalvarPC)
 
 close all;
 clc;
+
+if habSalvarPC
+    % Escolha a pasta onde serão salvas as PCs:
+    pathToSave= uigetdir(pathToSave, 'Escolha a pasta onde serão salvas as PCs.');
+
+    if ~pathToSave
+        msg= sprintf('Procedimento de triangulação cancelado!');
+        msgbox(msg, '', 'warn');
+        return;
+    end
+end
 
 % Define o formato dos dado snume´ricos como long:
 format long;
@@ -27,19 +38,21 @@ for (ct=1:numFiles)
                                    paramStereo.fc_left, paramStereo.cc_left, paramStereo.kc_left, paramStereo.alpha_c_left, ...
                                    paramStereo.fc_right, paramStereo.cc_right, paramStereo.kc_right, paramStereo.alpha_c_right);
     
-    % Salva os pontos 3D, nuvem de pontos, obtida por triangulação em arquivo no formato .txt:                             
-    % Define o nome do arquivo:
-    nameFile= sprintf('pontos3D_Stereo_%.02d.txt', ct); 
-    fullPath= fullfile(pathToSave, nameFile);
-    
-    % Abre o arquivo apara salvar os pontos 3D (nuvem de pontos) obtidos por triangulação:
-    fid = fopen(fullPath,'wt'); 
+    % Se estiver habilitado, serão salvos os pontos 3D, nuvem de pontos, obtida por triangulação em arquivo no formato .txt:                             
+    if habSalvarPC              
+        % Define o nome do arquivo:
+        nameFile= sprintf('pontos3D_Stereo_%.02d.txt', ct); 
+        fullPath= fullfile(pathToSave, nameFile);
 
-    % Salva o arquivo contendo os pontos 3D no formato .txt usando TB (\t) como tabulação:
-    fprintf(fid,'%.4f\t%.4f\t%.4f\n', XL);
-    
-    % fecha o arquivo geradao:
-    fclose(fid); 
+        % Abre o arquivo apara salvar os pontos 3D (nuvem de pontos) obtidos por triangulação:
+        fid = fopen(fullPath,'wt'); 
+
+        % Salva o arquivo contendo os pontos 3D no formato .txt usando TB (\t) como tabulação:
+        fprintf(fid,'%.4f\t%.4f\t%.4f\n', XL);
+
+        % fecha o arquivo geradao:
+        fclose(fid);
+    end
     
     % Retorna as PC geradas no formato xyz:
     xyzStereo{ct}= XL;

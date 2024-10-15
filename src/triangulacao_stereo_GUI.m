@@ -22,7 +22,7 @@ function varargout = triangulacao_stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help triangulacao_stereo_GUI
 
-% Last Modified by GUIDE v2.5 24-Apr-2024 12:43:43
+% Last Modified by GUIDE v2.5 10-Oct-2024 20:11:58
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,12 +52,24 @@ function triangulacao_stereo_GUI_OpeningFcn(hObject, eventdata, handles, varargi
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to triangulacao_stereo_GUI (see VARARGIN)
 
+handles.ctFigureSave= 0;
 
-handles.pathToReadCalibFile= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in';
-handles.pathToRead_L= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\09_04_2024_B\L';
-handles.pathToRead_R= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\09_04_2024_B\R';
-handles.pathToSave= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
-handles.pathToReadPC= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+usandoNoteBook= 1;
+
+if usandoNoteBook
+    handles.pathToReadCalibFile= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in';
+    handles.pathToRead_L= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\09_04_2024_A\L';
+    handles.pathToRead_R= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\09_04_2024_A\R';
+    handles.pathToSave= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+    handles.pathToReadPC= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+    handles.pathToSaveFigure= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+else
+    handles.pathToReadCalibFile= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in';
+    handles.pathToRead_L= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\09_04_2024_B\L';
+    handles.pathToRead_R= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\in\09_04_2024_B\R';
+    handles.pathToSave= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+    handles.pathToReadPC= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
+end
 
 handles.pathToReadPC_qualquer= 'C:\Projetos\Matlab\programas_GUI\triangulacao_Stereo_GUI\out';
 
@@ -259,17 +271,17 @@ function pbExecTriangulacao_Callback(hObject, eventdata, handles)
 clc;
 close all;
 
-pathToSave= uigetdir(handles.pathToSave, 'Defina onde salvar os arquivos.');
+% pathToSave= uigetdir(handles.pathToSave, 'Escolha pasta onde serão salvos arquivos.');
+% 
+% if ~pathToSave
+%     msg= sprintf('Processo de triangulação foi cancelado!');
+%     msgbox(msg, '', 'warn');
+%     return;
+% end
+% 
+% handles.pathToSave= pathToSave;
 
-if ~pathToSave
-    msg= sprintf('Processo de escolha do arquivo foi cancelado!');
-    msgbox(msg, '', 'warn');
-    return;
-end
-
-handles.pathToSave= pathToSave;
-
-handles.xyzStereo= fTriangulacaoStereo(handles.paramStereo, handles.param_L, handles.param_R, handles.pathToSave);
+handles.xyzStereo= fTriangulacaoStereo(handles.paramStereo, handles.param_L, handles.param_R, handles.pathToSave, handles.habSalvarPC);
 
 handles.TriangulacaoStereo_ok= 1;
 
@@ -299,7 +311,8 @@ function pbShowPCs_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-fShowPCs(handles.xyzStereo, handles.ShowDuasPCsSobrepostas, handles.pathToReadPC);
+handles.ctFigureSave= fShowPCs(handles.xyzStereo, handles.ShowDuasPCsSobrepostas, handles.pathToReadPC, ...
+                               handles.pathToSaveFigure, handles.habSaveFigure, handles.ctFigureSave);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -361,5 +374,73 @@ grid on;
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
+
+
+
+
+% --- Executes on button press in rdSavePCsGeradas.
+function rdSavePCsGeradas_Callback(hObject, eventdata, handles)
+% hObject    handle to rdSavePCsGeradas (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rdSavePCsGeradas
+
+handles.habSalvarPC= hObject.Value;
+
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function rdSavePCsGeradas_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rdSavePCsGeradas (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+handles.habSalvarPC= hObject.Value;
+
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes on button press in rdSaveFigure.
+function rdSaveFigure_Callback(hObject, eventdata, handles)
+% hObject    handle to rdSaveFigure (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rdSaveFigure
+
+handles.habSaveFigure= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function rdSaveFigure_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rdSaveFigure (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
+handles.habSaveFigure= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes on button press in pushbutton8.
+function pushbutton8_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton8 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+close all;
 
 
